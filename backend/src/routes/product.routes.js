@@ -10,7 +10,7 @@ router.route("/updatestock").put(verifyJWT,requireRole("admin"),updateProduct);
 router.route("/delete/:productId").delete(verifyJWT,requireRole("admin"),deleteProduct);
 router.route("/").get(getAllProducts).post(verifyJWT,requireRole("admin"),
     upload.fields([{
-        name:'image',
+        name:'imageUrl',
         maxCount: 1
     }]),
     createProduct

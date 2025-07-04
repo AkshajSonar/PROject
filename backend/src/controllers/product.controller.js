@@ -18,24 +18,30 @@ if (price < 0 || stock < 0) {
   if (!req.user || !req.user._id) {
     throw new ApiError(401, "Unauthorised request");
   }
-  if (!req.files || !req.files.image || req.files.image.length === 0)
-  {
-    throw new ApiError(400, "Product image is required");
-  }
 
-  const productImageLocalPath = req.files?.image[0]?.path;
+  const productImageLocalPath = req.files?.imageUrl[0]?.path;
   
   if (!productImageLocalPath) {
     throw new ApiError(400, "Product image is required");
   }
   const productImage = await uploadOnCloudinary(productImageLocalPath);
   if (!productImage?.url) {
-  await fs.unlink(productImageLocalPath); // Clean up
-  throw new ApiError(400, "Product image upload failed");
+  try {
+    await fs.unlink(productImageLocalPath);
+  } catch (err) {
+    console.warn("Cleanup failed:", err.message);
   }
+  throw new ApiError(400, "Product image upload failed");
+}
+
 
 // After successful upload, delete the local file
-await fs.unlink(productImageLocalPath);
+try {
+  await fs.unlink(productImageLocalPath);
+} catch (err) {
+  console.warn("Could not delete local file:", err.message);
+}
+
   const newProduct = new Product({
     name,
     price,
