@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/HomePage";
 import Login from "./pages/Login"; // Unified login page
 import Signup from "./pages/Signup.jsx";
+import AdminDashboard from './pages/AdminDashboard';
+import UserDashboard from './pages/UserDashboard';
 
 // Optional: fallback 404 page
 const NotFound = () => (
@@ -24,6 +26,10 @@ function App() {
 
         {/* Catch-all */}
         <Route path="*" element={<NotFound />} />
+
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/user/dashboard" element={<UserDashboard />} />
+
       </Routes>
     </Router>
   );

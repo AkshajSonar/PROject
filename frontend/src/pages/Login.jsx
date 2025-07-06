@@ -20,48 +20,55 @@ const Login = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
+  e.preventDefault();
+  setError("");
 
-    try {
-      console.log(formData);
-      const res = await axios.post(
-        "http://localhost:8000/api/v1/users/login", // your backend URL
-        {
-          email: formData.emailOrUsername.includes("@")
-            ? formData.emailOrUsername
-            : undefined,
-          username: !formData.emailOrUsername.includes("@")
-            ? formData.emailOrUsername
-            : undefined,
-          password: formData.password,
-          role: formData.role,
-          
-        },
-        { withCredentials: true }
-      );
-console.log(res.data.user);
-    console.log(res.data);
-    console.log(res.data.data);
-    console.log(res);
-    
-  const user = res?.data?.data?.user; 
-  console.log(user);
-      if (user.role !== formData.role) {
-        setError("Incorrect role selected for this account");
-        return;
-      }
+  try {
+    const res = await axios.post(
+      "http://localhost:8000/api/v1/users/login",
+      {
+        email: formData.emailOrUsername.includes("@")
+          ? formData.emailOrUsername
+          : undefined,
+        username: !formData.emailOrUsername.includes("@")
+          ? formData.emailOrUsername
+          : undefined,
+        password: formData.password,
+        role: formData.role,
+      },
+      { withCredentials: true }
+    );
 
-      if (user.role === "admin") {
-        navigate("/admin/dashboard");
-      } else {
-        navigate("/user/dashboard");
-      }
-    } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.message || "Login failed");
+    const user = res?.data?.data?.user;
+    const token = res?.data?.data?.accessToken;
+
+    if (!user || !token) {
+      setError("Invalid login response");
+      return;
     }
-  };
+
+    if (user.role !== formData.role) {
+      setError("Incorrect role selected for this account");
+      return;
+    }
+
+    // ✅ Save token for future authenticated requests
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user)); // Optional: if you want to reuse user info
+
+    // ✅ Redirect based on role
+    if (user.role === "admin") {
+      navigate("/admin/dashboard");
+    } else {
+      navigate("/user/dashboard");
+    }
+
+  } catch (err) {
+    console.error(err);
+    setError(err.response?.data?.message || "Login failed");
+  }
+};
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 to-blue-100 p-4">
