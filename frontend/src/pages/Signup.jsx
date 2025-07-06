@@ -32,16 +32,17 @@ const handleSubmit = async (e) => {
   });
 
   try {
+    console.log(Object.fromEntries(data.entries()));
+
     const res = await axios.post(
-      "http://localhost:8000/api/v1/users/register",
-      data,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        withCredentials: true,
-      }
-    );
+  "http://localhost:8000/api/v1/users/register",
+  data,
+  {
+    withCredentials: true,
+  }
+);
+
+
 
     if (res.data?.success) {
       alert("Signup successful!");

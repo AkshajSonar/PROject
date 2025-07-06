@@ -24,8 +24,9 @@ const Login = () => {
     setError("");
 
     try {
+      console.log(formData);
       const res = await axios.post(
-        "http://localhost:5000/api/v1/users/login", // your backend URL
+        "http://localhost:8000/api/v1/users/login", // your backend URL
         {
           email: formData.emailOrUsername.includes("@")
             ? formData.emailOrUsername
@@ -34,12 +35,18 @@ const Login = () => {
             ? formData.emailOrUsername
             : undefined,
           password: formData.password,
+          role: formData.role,
+          
         },
         { withCredentials: true }
       );
-
-      const user = res.data.user;
-
+console.log(res.data.user);
+    console.log(res.data);
+    console.log(res.data.data);
+    console.log(res);
+    
+  const user = res?.data?.data?.user; 
+  console.log(user);
       if (user.role !== formData.role) {
         setError("Incorrect role selected for this account");
         return;
@@ -100,10 +107,5 @@ const Login = () => {
     </div>
   );
 };
-console.log("User found:", user);
-console.log("Password valid:", isPasswordVailid);
 
-const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
-
-console.log("Logged in user:", loggedInUser);
 export default Login;

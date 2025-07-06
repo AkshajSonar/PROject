@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/HomePage";
 import Login from "./pages/Login"; // Unified login page
-import Signup from "./pages/Signup";
+import Signup from "./pages/Signup.jsx";
 
 // Optional: fallback 404 page
 const NotFound = () => (

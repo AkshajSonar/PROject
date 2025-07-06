@@ -33,7 +33,7 @@ const registerUser = asyncHandler(async (req, res) => {
   // check for user creation
   // return response to frontend
 
-  const { fullName, email, username, password,role } = req.body;
+  const { fullName, email, username, password } = req.body;
   if (
     [fullName, email, username, password].some((field) => field?.trim() === "")
   ) {
@@ -48,13 +48,13 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, "User already exists");
   }
 
-  const avatarLocalPath = req.files?.avatar?.[0]?.path;
+  const avatarLocalPath = req.files?.avatar[0]?.path;
   // const coverImageLocalPath = req.files?.coverImage[0]?.path;
   let coverImageLocalPath;
   if (
     req.files &&
-    Array.isArray(req.files.coverImage) &&
-    req.files.coverImage.length > 0
+    req.files.coverImage.length > 0 &&
+    Array.isArray(req.files.coverImage)
   ) {
     coverImageLocalPath = req.files.coverImage[0].path;
   }
@@ -75,7 +75,6 @@ const registerUser = asyncHandler(async (req, res) => {
     email,
     password,
     username: username.toLowerCase(),
-    role,
   });
 
   const createdUser = await User.findById(user._id).select(
@@ -89,105 +88,45 @@ const registerUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, createdUser, "User registered successfully"));
 });
 
-// const loginUser = asyncHandler(async (req, res) => {
-//   // req body->data
-//   // username or email
-//   // find the user
-//   // password check
-//   // acces and refresh token generation
-//   // send cookies
-
-//   const { email, username, password } = req.body;
-//   if (!username && !email) {
-//     throw new ApiError(400, "Username or email are required");
-//   }
-//   const user = await User.findOne({
-//     $or: [{ username }, { email }],
-//   });
-
-//   if (!user) {
-//     throw new ApiError(404, "User not found");
-//   }
-//   const isPasswordVailid = await user.isPasswordCorrect(password);
-//   if (!isPasswordVailid) {
-//     throw new ApiError(401, "Invalid password");
-//   }
-
-//   const { accessToken, refreshToken } = await generateAccessandRefreshTokens(
-//     user._id
-//   );
-
-//   const loggedInUser = await User.findById(user._id).select(
-//     "-password -refreshToken"
-//   );
-//   if (!loggedInUser) {
-//     throw new ApiError(500, "Login failed");
-//   }
-
-//   const options = {
-//   httpOnly: true,
-//   secure: process.env.NODE_ENV === "production", // ✅ only true in production
-//   sameSite: "lax", // optional but helpful
-// };
-
-//   return res
-//     .status(200)
-//     .cookie("accessToken", accessToken, options)
-//     .cookie("refreshToken", refreshToken, options)
-//     .json(
-//       new ApiResponse(
-//         200,
-//         {
-//           user: loggedInUser,
-//           accessToken,
-//           refreshToken,
-//         },
-//         "User logged in successfully"
-//       )
-//     );
-// });
 const loginUser = asyncHandler(async (req, res) => {
+  // req body->data
+  // username or email
+  // find the user
+  // password check
+  // acces and refresh token generation
+  // send cookies
+
   const { email, username, password } = req.body;
   if (!username && !email) {
     throw new ApiError(400, "Username or email are required");
   }
-
   const user = await User.findOne({
     $or: [{ username }, { email }],
   });
 
-  console.log("User found:", user); // ✅ LOG
-
   if (!user) {
     throw new ApiError(404, "User not found");
   }
-
   const isPasswordVailid = await user.isPasswordCorrect(password);
-  console.log("Password valid:", isPasswordVailid); // ✅ LOG
-
   if (!isPasswordVailid) {
     throw new ApiError(401, "Invalid password");
-  }
-
-  const loggedInUser = await User.findById(user._id).select(
-    "-password -refreshToken"
-  );
-  console.log("Logged in user:", loggedInUser); // ✅ LOG
-
-  if (!loggedInUser) {
-    throw new ApiError(500, "Login failed");
   }
 
   const { accessToken, refreshToken } = await generateAccessandRefreshTokens(
     user._id
   );
 
+  const loggedInUser = await User.findById(user._id).select(
+    "-password -refreshToken"
+  );
+  if (!loggedInUser) {
+    throw new ApiError(500, "Login failed");
+  }
+
   const options = {
     httpOnly: true,
-    secure: false, // change to `true` only in production with HTTPS
-    sameSite: "lax", // helps with dev mode cross-origin cookie issues
+    secure: true,
   };
-
   return res
     .status(200)
     .cookie("accessToken", accessToken, options)
@@ -204,7 +143,6 @@ const loginUser = asyncHandler(async (req, res) => {
       )
     );
 });
-
 
 const logoutUser = asyncHandler(async (req, res) => {
   // clear cookies
