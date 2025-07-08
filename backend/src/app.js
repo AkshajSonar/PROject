@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser";
 const app = express();
 
 app.use(cors({
-  origin: "http://localhost:5173", // or use process.env.CORS_ORIGIN properly
+  origin: "http://localhost:5174", // or use process.env.CORS_ORIGIN properly
   credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders: ["Content-Type", "Authorization"],
