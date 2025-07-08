@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import EditProduct from './EditProduct';
+import { useNavigate } from "react-router-dom";
 
 const AdminProductList = () => {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-
+  const navigate = useNavigate();
   const fetchData = () => {
   const token = localStorage.getItem("token");
 
@@ -45,7 +47,9 @@ const AdminProductList = () => {
   }
 };
 
-
+  const handleUpdate = (id) => {
+    navigate(`/products/edit/${id}`);
+  };
 
   return (
     <>
@@ -72,6 +76,9 @@ const AdminProductList = () => {
             >
               Delete
             </button>
+             <button onClick={(e) => {
+              e.stopPropagation();
+              handleUpdate(product._id)}}>Update</button>
           </div>
         ))}
       </div>
